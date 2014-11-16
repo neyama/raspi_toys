@@ -18,18 +18,16 @@ end
 Thread.new do
   # initialize GPIO 27 pin
   pin=PiPiper::Pin.new pin: 27, direction: :out
-  loop {
-    event=queue.pop
+  loop do
+    event=queue.pop # blocks until new event arrives
 
-    t=event[:time]
-    s=event[:state]
-
-    tts=t+DELAY-Time.now
+    # sleep until DELAY secs after the time when event occured
+    tts=event[:time]+DELAY-Time.now
     sleep tts if tts>0 # waits tts sec if needed
 
     # LED on/off
-    pin.update_value s
-  }
+    pin.update_value event[:state]
+  end
 end
 
 PiPiper.wait # blocks the main thread
